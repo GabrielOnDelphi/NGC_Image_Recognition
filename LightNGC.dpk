@@ -1,0 +1,56 @@
+package LightNGC;
+
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 2}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Light - NGC'}
+{$LIBSUFFIX AUTO}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  LightCore,
+  vclimg,
+  vcl,
+  LightVclCommon,
+  ThirdPartyLibs,
+  GR32_R,
+  CCRExif,
+  LightVclGraphics;
+
+contains
+  ngcImageUtils in 'ngcImageUtils.pas',
+  ngcCorrel in 'ngcCorrel.pas',
+  ngcCorrel2 in 'ngcCorrel2.pas',
+  ngcAppUtils in 'ngcAppUtils.pas';
+
+{ If you get E1025 "Unsupported language feature Object":
+      Go to "Project Objects > Delphi Compiler > Output - C/C++ > C/C++ Output file generation",
+      change the value to "Generate DCUs Only" instead of the default value "Generate all C++Builder files (including package libs)"
+      https://synopse.info/forum/viewtopic.php?pid=31281#p31281 }
+
+end.

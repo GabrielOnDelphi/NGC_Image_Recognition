@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{EE5AC082-2ABA-4509-A01D-BE6263954400}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="LightNGC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Tester\ImageDetection.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="LightNGC">
+        <MSBuild Projects="LightNGC.dproj"/>
+    </Target>
+    <Target Name="LightNGC:Clean">
+        <MSBuild Projects="LightNGC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LightNGC:Make">
+        <MSBuild Projects="LightNGC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImageDetection">
+        <MSBuild Projects="Tester\ImageDetection.dproj"/>
+    </Target>
+    <Target Name="ImageDetection:Clean">
+        <MSBuild Projects="Tester\ImageDetection.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImageDetection:Make">
+        <MSBuild Projects="Tester\ImageDetection.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="LightNGC;ImageDetection"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="LightNGC:Clean;ImageDetection:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="LightNGC:Make;ImageDetection:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
