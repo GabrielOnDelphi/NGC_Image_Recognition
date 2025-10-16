@@ -3,7 +3,7 @@ program NGC_ImageDetection;
 uses
   Fastmm4,
   Forms,
-  LightCore.AppData, LightVcl.Common.AppData,
+  LightCore.AppData, LightVcl.Visual.AppData,
   ngcAppUtils in '..\ngcAppUtils.pas',
   ngcImageUtils in '..\ngcImageUtils.pas',
   ngcCorrel2 in '..\ngcCorrel2.pas',

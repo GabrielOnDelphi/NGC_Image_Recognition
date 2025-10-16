@@ -14,8 +14,8 @@ INTERFACE
 
 USES
   WinApi.Windows, WinApi.Messages, System.SysUtils, System.Classes,
-  Vcl.StdCtrls, Vcl.Forms, LightVcl.Common.AppDataForm,Vcl.Controls, Vcl.Samples.Spin, Vcl.ExtCtrls, Vcl.Graphics, Vcl.Dialogs, Vcl.ComCtrls,
-  ngcAppUtils, LightCore.AppData, LightVcl.Common.AppData
+  Vcl.StdCtrls, Vcl.Forms, LightVcl.Visual.AppDataForm,Vcl.Controls, Vcl.Samples.Spin, Vcl.ExtCtrls, Vcl.Graphics, Vcl.Dialogs, Vcl.ComCtrls,
+  ngcAppUtils, LightCore.AppData, LightVcl.Visual.AppData
 , ngcCorrel2, LightVcl.Visual.INIFile;
 
 TYPE

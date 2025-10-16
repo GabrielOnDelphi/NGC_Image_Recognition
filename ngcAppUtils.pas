@@ -14,7 +14,7 @@ UNIT ngcAppUtils;
 INTERFACE
 
 USES
-   Winapi.Windows, Winapi.ShellAPI, System.SysUtils, Vcl.Dialogs, Vcl.Forms, LightVcl.Common.AppDataForm,Vcl.Graphics,
+   Winapi.Windows, Winapi.ShellAPI, System.SysUtils, Vcl.Dialogs, Vcl.Forms, LightVcl.Visual.AppDataForm,Vcl.Graphics,
    System.Diagnostics;
 
 CONST
