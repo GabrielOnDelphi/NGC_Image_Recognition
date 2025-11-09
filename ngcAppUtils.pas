@@ -3,8 +3,9 @@ UNIT ngcAppUtils;
 {=============================================================================================================
   NGC App Utils
   ------------------------------------------------------------------------------------------------------------
-  2024.12
   www.GabrielMoraru.com
+  2024.12
+  Github.com/GabrielOnDelphi/Delphi-LightSaber/blob/main/System/Copyright.txt
   ------------------------------------------------------------------------------------------------------------
   General functions.
   All these are available in my LightSaber library, but I wanted to decrease dependency on that library,

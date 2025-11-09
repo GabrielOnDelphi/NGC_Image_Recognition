@@ -3,8 +3,9 @@ UNIT ngcCorrel2;
 {=============================================================================================================
   NGC Region detection
   ------------------------------------------------------------------------------------------------------------
-  2023
   www.GabrielMoraru.com
+  2023
+  Github.com/GabrielOnDelphi/Delphi-LightSaber/blob/main/System/Copyright.txt
   ------------------------------------------------------------------------------------------------------------
   The Pattern could appear several times in the MainImage.
   This unit returns a sorted list of the best correlation (top positions).

@@ -3,8 +3,9 @@ UNIT ngcCorrel;
 {=============================================================================================================
   NGC Pixel correlation
   ------------------------------------------------------------------------------------------------------------
-  2023
   www.GabrielMoraru.com
+  2023
+  Github.com/GabrielOnDelphi/Delphi-LightSaber/blob/main/System/Copyright.txt
   ------------------------------------------------------------------------------------------------------------
   An NGC algorithm is used to determine the position of a pattern in an image.
   The function generates output values that represent the correspondence between the structures of the pattern and those of the image.
