@@ -125,16 +125,6 @@ end;
 
 
 
-procedure FillBitmap(InputBitmap: TBitmap; Color: TColor);
-begin
- InputBitmap.Canvas.Brush.Color:= Color;
- InputBitmap.Canvas.Brush.Style:= bsSolid;
- InputBitmap.Canvas.FillRect(InputBitmap.Canvas.ClipRect);
-end;
-
-
-
-
 
 
 
