@@ -68,11 +68,12 @@
         <DCCReference Include="LightCore.dcp"/>
         <DCCReference Include="vclimg.dcp"/>
         <DCCReference Include="vcl.dcp"/>
-        <DCCReference Include="LightVclCommon.dcp"/>
+        <DCCReference Include="LightVcl.Common.dcp"/>
         <DCCReference Include="ThirdPartyLibs.dcp"/>
         <DCCReference Include="GR32_R.dcp"/>
         <DCCReference Include="CCRExif.dcp"/>
-        <DCCReference Include="LightVclGraphics.dcp"/>
+        <DCCReference Include="LightVcl.Graphics.dcp"/>
+        <DCCReference Include="LightVcl.Visual.dcp"/>
         <DCCReference Include="ngcImageUtils.pas"/>
         <DCCReference Include="ngcCorrel.pas"/>
         <DCCReference Include="ngcCorrel2.pas"/>
