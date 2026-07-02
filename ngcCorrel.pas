@@ -4,14 +4,13 @@ UNIT ngcCorrel;
   NGC Pixel correlation
   ------------------------------------------------------------------------------------------------------------
   www.GabrielMoraru.com
-  2023
+  2026.07.01
   Github.com/GabrielOnDelphi/Delphi-LightSaber/blob/main/System/Copyright.txt
   ------------------------------------------------------------------------------------------------------------
   An NGC algorithm is used to determine the position of a pattern in an image.
   The function generates output values that represent the correspondence between the structures of the pattern and those of the image.
-  The position of the pattern is given relative to the center of Pattern.
-  Because of this reason, in the resulting image half the pattern width and half the pattern height around the edges,
-   do not contain any correlation results! This is normal.
+  The reported position is the pattern's top-left corner (NOT its center) in the Main image.
+  Because of this, the resulting image has no correlation results in a border margin: about half the pattern size on the left and top edges, and nearly a full pattern size on the right and bottom edges. This is normal.
   ------------------------------------------------------------------------------------------------------------
   Possible optimizations:
      https://en.wikipedia.org/wiki/DBSCAN
@@ -141,9 +140,13 @@ begin
  then Result:= ResultN
  else Result:= ResultN / sqrt(ResultD1 * ResultD2);
 
- // Just in case
- Assert(Result >= -1);
- Assert(Result <=  1);
+ // Just in case. Tolerance needed: on a perfect match, floating-point rounding can push the value epsilon-outside the -1..+1 range
+ Assert(Result >= -1.000001);
+ Assert(Result <=  1.000001);
+
+ // Clamp the floating-point noise so RangeToByte always receives a value in -1..+1
+ if Result >  1 then Result:=  1;
+ if Result < -1 then Result:= -1;
 end;
 
 
@@ -158,27 +161,25 @@ VAR
    Pix: Integer;
    rw, cl: Integer;
    M,N: Integer;                        // half size
-   iWidth, iHeight: Integer;            // Image width/height minus borders
+   iWidth, iHeight: Integer;            // Last valid top-left coordinate for the sliding window
    ChopMX: TIntegerMatrix;
    PatternMX: TIntegerMatrix;
-   MainBmpMX: TByteMatrix;
-   Line: PByte;
    c: Cardinal;
 
    SrcRect, ChopRect: TRect;
    ChopBMP: TBitmap;
 
    { Copy a piece from the main image. }
-   procedure CreateChop(col, row: integer);
+   procedure CreateChop(Col, Row: integer);
    begin
      Assert(Col >= 0);
      Assert(Row >= 0);
 
-     Assert(Col < MainBMP.Width);
-     Assert(Row < MainBMP.Height);
+     Assert(Col + PatternBMP.Width  <= MainBMP.Width );  // The chop must fit entirely into the main image
+     Assert(Row + PatternBMP.Height <= MainBMP.Height);
 
-     SrcRect.Left:= cl;
-     SrcRect.Top := rw;
+     SrcRect.Left:= Col;
+     SrcRect.Top := Row;
      SrcRect.Width := PatternBMP.Width;
      SrcRect.Height:= PatternBMP.Height;
      ChopBMP.Canvas.CopyRect(ChopRect, MainBMP.Canvas, SrcRect);
@@ -186,6 +187,12 @@ VAR
    end;
 
 begin
+ // The whole pipeline (ScanLine used as PByte, GetAverageColorPf8, palette handling) requires 8-bit grayscale input
+ if MainBMP.PixelFormat <> pf8bit
+ then raise EInvalidGraphic.Create('CalculateNGC: MainBMP must be an 8-bit grayscale bitmap! Did LoadMain fail?');
+ if PatternBMP.PixelFormat <> pf8bit
+ then raise EInvalidGraphic.Create('CalculateNGC: PatternBMP must be an 8-bit grayscale bitmap! Did LoadPattern fail?');
+
  c:= GetTickCount;
 
  // Prepare output image
@@ -210,32 +217,24 @@ begin
  M:= Trunc(PatternBMP.Width  / 2);     // Middle point in the pattern image
  N:= Trunc(PatternBMP.Height / 2);     // Middle point in the pattern image
 
- { We ignore the last half of the row/column }
- iWidth := MainBMP.Width  -M;  //-1 ?
- iHeight:= MainBMP.Height -N;
+ { Last valid top-left position for the chop: the window must stay fully inside the image.
+   Going further right/bottom would make CopyRect read outside MainBMP, leaving stale pixels in ChopBMP. }
+ iWidth := MainBMP.Width  - PatternBMP.Width;
+ iHeight:= MainBMP.Height - PatternBMP.Height;
 
  { Prepare the small image }
  ChopBMP:= TBitmap.Create;
  TRY
    ChopBMP.PixelFormat:= MainBMP.PixelFormat;
-   ChopBMP.Palette    := MainBMP.Palette;
+   ChopBMP.Palette    := CopyPalette(MainBMP.Palette);   // CopyPalette because TBitmap takes ownership of the assigned HPALETTE and deletes it on destroy. Assigning MainBMP.Palette directly would make both bitmaps delete the same GDI handle!
    ChopBMP.SetSize(PatternBMP.Width, PatternBMP.Height);
    SetLength(ChopMX, ChopBMP.Width, ChopBMP.Height);
 
-   { We move the main bitmap to the array bitmap }
-   SetLength(MainBmpMX, MainBMP.Width, MainBMP.Height);
-   for rw:= 0 to MainBMP.Height-1 DO              // Vertical scan line by line
-    begin
-     Line:= MainBMP.ScanLine[rw];
-     for cl:= 0 to MainBMP.Width-1 DO
-       MainBmpMX[cl, rw]:= Line[cl];
-    end;
-
    // Main loop - Move the window from left to right / top to bottom
-   for rw:= N to iHeight-1{PaternBMP.Height} DO
+   for rw:= N to iHeight DO
     begin
 
-     for cl:= M to iWidth-1{PaternBMP.Width} DO
+     for cl:= M to iWidth DO
       begin
         { Copy a small piece from the main image. }
         CreateChop(cl, rw);
@@ -248,15 +247,12 @@ begin
         OutputBMP.Canvas.Pixels[cl, rw]:= RGB(Pix, Pix, Pix);   //todo: use scanline here. Canvas.Pixels adds quite a few seconds
       end;
 
-      // Update from time to time
-      if Preview <> NIL then
+      // Update the preview from time to time
+      if (Preview <> NIL) AND (GetTickCount-c > 400 {ms}) then
         begin
           Preview.Picture.Assign(OutputBMP);
-          if GetTickCount-c > 400 {ms} then
-           begin
-             Preview.Update;
-             c:= GetTickCount;
-           end;
+          Preview.Update;
+          c:= GetTickCount;
         end;
     end;
 
