@@ -4,7 +4,7 @@ UNIT ngcCorrel2;
   NGC Region detection
   ------------------------------------------------------------------------------------------------------------
   www.GabrielMoraru.com
-  2023
+  2026.07.01
   Github.com/GabrielOnDelphi/Delphi-LightSaber/blob/main/System/Copyright.txt
   ------------------------------------------------------------------------------------------------------------
   The Pattern could appear several times in the MainImage.
@@ -68,7 +68,7 @@ TYPE
 IMPLEMENTATION
 
 CONST
-   Bkg= 0;  //Default= 0 but we use a slight shade of gray (50) so we can visualize the detected objects
+   Bkg= 0;  // Background = black. For debugging, set it to a visible shade of gray (e.g. 50) to visualize which pixels were visited/cleared
 
 
 constructor TCorrel2.Create;
@@ -80,7 +80,7 @@ end;
 
 destructor TCorrel2.Destroy;
 begin
-  Clear;
+  ReleaseRegions;   // Don't call Clear here: Clear touches OutputBMP, which is NIL when our constructor failed half-way (Destroy is called on partially-constructed objects)
   FreeAndNil(FinalBMP);
   FreeAndNil(Regions);
   inherited Destroy;
@@ -107,8 +107,7 @@ VAR
   LineI, LineO: PPixelArray;
 begin
  //Load input img into the output image
- FinalBMP.Assign(OutputBMP);
- FinalBMP.Palette:= OutputBMP.Palette;
+ FinalBMP.Assign(OutputBMP);   // Assign also shares the palette. Never assign OutputBMP.Palette directly: TBitmap takes ownership of the assigned HPALETTE and would delete OutputBMP's palette handle on destroy!
 
  // Blank the output image
  FillBitmap(FinalBMP, clBlack);
@@ -241,9 +240,11 @@ begin
 
        REPEAT                                             // Scan next line(s)
          Inc(y2);
-       UNTIL NOT FindBrigthPxOnLine(y2, x, BrightPoint) OR (y2 >= FinalBMP.Height-BorderH);
+       UNTIL (y2 >= FinalBMP.Height-BorderH) OR NOT FindBrigthPxOnLine(y2, x, BrightPoint);   // Check the bounds BEFORE calling FindBrigthPxOnLine
 
-       x:= RegEndX+1;                                     // Increment x manualy to be equal with the end of the region (once the region is found) so we don't have to rescan this region
+       // No jump over the region is needed here: findBrigthPxOnLine cleared (set to Bkg) every pixel it visited,
+       // so re-walking them cannot trigger a second detection.
+       // The old jump (x:= RegEndX+1 followed by Inc(x)) skipped 2 not-yet-examined columns after each region and could miss/split small neighbor regions.
       end;
 
      Inc(x);
@@ -276,6 +277,7 @@ procedure TCorrel2.ShowPixels;
 VAR
    Line: PPixelArray;
 begin
+   Assert(Regions <> NIL, 'ShowPixels: Call GetRegions first!');
    for VAR Region in Regions DO
     begin
       Line:= FinalBMP.ScanLine[Region.Y];  //ToDo: minify
@@ -288,8 +290,8 @@ end;
 { Eliminate all regions with brightness under this threshold }
 procedure TCorrel2.DrawBoxes(Image: TImage; BrightnessThresh: Integer);
 begin
-  MainBMP.PixelFormat:= pf32bit;
-  IncreaseClrDepth(Image);
+  Assert(Regions <> NIL, 'DrawBoxes: Call GetRegions first!');
+  MainBMP.PixelFormat:= pf32bit;   // So we can draw colored (red) boxes on the grayscale image
 
   for VAR i:= 0 to Regions.Count- 1 DO
    begin
@@ -330,16 +332,20 @@ end;
 // Keep in the list only the first x values
 procedure TCorrel2.PopulateResults(ListBox: TListBox; TopResultsCount: Integer);
 begin
-  ListBox.Items.Clear;
+  Assert(Regions <> NIL, 'PopulateResults: Call GetRegions first!');
   ListBox.Items.BeginUpdate;
-  for VAR i:= 0 to TopResultsCount- 1 DO
-   begin
-    if i >= Regions.Count then Break;  // Do we have enough results to show?
-    ListBox.Items.Add(' Br= '+ IntToStr(Regions[i].Brightness)
-                    + '  X= '+ IntToStr(Regions[i].X)
-                    + '  Y= '+ IntToStr(Regions[i].Y));
-   end;
-  ListBox.Items.EndUpdate;
+  TRY
+    ListBox.Items.Clear;
+    for VAR i:= 0 to TopResultsCount- 1 DO
+     begin
+      if i >= Regions.Count then Break;  // Do we have enough results to show?
+      ListBox.Items.Add(' Br= '+ IntToStr(Regions[i].Brightness)
+                      + '  X= '+ IntToStr(Regions[i].X)
+                      + '  Y= '+ IntToStr(Regions[i].Y));
+     end;
+  FINALLY
+    ListBox.Items.EndUpdate;
+  END;
 end;
 
 
