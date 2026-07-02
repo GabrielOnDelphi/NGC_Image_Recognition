@@ -53,9 +53,9 @@ begin
  then RAISE Exception.Create('Array is empty!');
 
  Summ:= 0;
- for Row := Low(Bmp) to High(Bmp) do
-   for Col := Low(Bmp[Row]) to High(Bmp[Row]) do
-     Summ := Summ + bmp[Col, Row];
+ for Col := Low(Bmp) to High(Bmp) do          // The first index is the column - matrices are indexed [Col, Row]
+   for Row := Low(Bmp[Col]) to High(Bmp[Col]) do
+     Summ := Summ + Bmp[Col, Row];
 
  VAR TotalElements := Length(Bmp) * Length(Bmp[0]);
  Result := Round(Summ / TotalElements);
@@ -112,7 +112,7 @@ begin
     // Draw on the color bitmap
     Img.Picture.Assign(ColorBitmap);
   finally
-    ColorBitmap.Free;
+    FreeAndNil(ColorBitmap);
   end;
 end;
 
