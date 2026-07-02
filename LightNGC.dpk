@@ -36,11 +36,12 @@ requires
   LightCore,
   vclimg,
   vcl,
-  LightVclCommon,
+  LightVcl.Common,
   ThirdPartyLibs,
   GR32_R,
   CCRExif,
-  LightVclGraphics;
+  LightVcl.Graphics,
+  LightVcl.Visual;
 
 contains
   ngcImageUtils in 'ngcImageUtils.pas',
