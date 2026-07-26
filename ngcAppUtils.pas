@@ -161,7 +161,7 @@ end;
 -------------------------------------------------------------------------------------------------------------}
 function ExecuteShell(CONST ExeFile: string; Params: string= ''; ShowErrorMsg: Boolean= TRUE; WindowState: Integer= WinApi.Windows.SW_SHOWNORMAL): Boolean;
 VAR
-   i: integer;
+   i: HINST;   { ShellExecute returns HINST - pointer-width on Win64 (Winapi.ShellAPI). Integer here would truncate. }
    Msg: string;
 begin
  i:= ShellExecute(0, 'open', PChar(ExeFile), Pointer(Params), NIL, WindowState);   //  See this about using 'Pointer' instead of 'PChar': http://stackoverflow.com/questions/3048188/shellexecute-not-working-from-ide-but-works-otherwise
