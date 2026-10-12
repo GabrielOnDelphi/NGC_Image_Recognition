@@ -14,6 +14,7 @@ uses
 
 begin
   AppData:= TAppData.Create('Light NgcTester4', '');
-  AppData.CreateMainForm(TfrmTester, frmTester, TRUE, TRUE);
+  Application.MainFormOnTaskbar:= TRUE;
+  AppData.CreateMainForm(TfrmTester, frmTester, asFull);
   AppData.Run;
 end.
