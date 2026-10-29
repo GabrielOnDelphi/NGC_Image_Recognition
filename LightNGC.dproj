@@ -71,7 +71,7 @@
         <DCCReference Include="LightVcl.Common.dcp"/>
         <DCCReference Include="ThirdPartyLibs.dcp"/>
         <DCCReference Include="GR32_R.dcp"/>
-        <DCCReference Include="CCRExif.dcp"/>
+        <DCCReference Include="LightExternal.dcp"/>
         <DCCReference Include="LightVcl.Graphics.dcp"/>
         <DCCReference Include="LightVcl.Visual.dcp"/>
         <DCCReference Include="ngcImageUtils.pas"/>
